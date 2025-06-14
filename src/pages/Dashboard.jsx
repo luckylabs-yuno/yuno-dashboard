@@ -251,11 +251,13 @@ export default function Dashboard() {
               WebkitBackdropFilter: 'blur(20px)',
               border: `1px solid ${colors.cardBorder}`,
               borderRadius: '20px',
-              padding: '16px 24px',
-              boxShadow: colors.shadow
+              padding: '16px 20px',
+              boxShadow: colors.shadow,
+              flexWrap: 'wrap',
+              gap: '16px'
             }}>
               {/* User Info */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0, flex: 1 }}>
                 <div style={{
                   width: '40px',
                   height: '40px',
@@ -267,16 +269,20 @@ export default function Dashboard() {
                   color: '#FFFFFF',
                   fontWeight: '700',
                   fontSize: '16px',
-                  fontFamily: 'Montserrat, sans-serif'
+                  fontFamily: 'Montserrat, sans-serif',
+                  flexShrink: 0
                 }}>
                   {session?.user?.email?.[0]?.toUpperCase()}
                 </div>
-                <div>
+                <div style={{ minWidth: 0, flex: 1 }}>
                   <div style={{
                     color: colors.text,
                     fontWeight: '600',
                     fontSize: '14px',
-                    fontFamily: 'Inter, sans-serif'
+                    fontFamily: 'Inter, sans-serif',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap'
                   }}>
                     {session?.user?.email}
                   </div>
@@ -284,31 +290,31 @@ export default function Dashboard() {
                     <div style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '12px',
-                      marginTop: '4px'
+                      gap: '8px',
+                      marginTop: '6px',
+                      flexWrap: 'wrap'
                     }}>
                       <div style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '6px',
+                        gap: '4px',
                         background: colors.cardBackgroundHover,
-                        padding: '4px 8px',
-                        borderRadius: '8px',
-                        border: `1px solid ${colors.cardBorder}`
+                        padding: '3px 6px',
+                        borderRadius: '6px',
+                        border: `1px solid ${colors.cardBorder}`,
+                        fontSize: '11px'
                       }}>
                         <span style={{
                           color: colors.textSecondary,
-                          fontSize: '11px',
                           fontFamily: 'Inter, sans-serif',
                           textTransform: 'uppercase',
-                          letterSpacing: '0.5px',
+                          letterSpacing: '0.3px',
                           fontWeight: '600'
                         }}>
-                          Site ID:
+                          ID:
                         </span>
                         <span style={{
                           color: colors.text,
-                          fontSize: '12px',
                           fontFamily: 'Inter, sans-serif',
                           fontWeight: '600'
                         }}>
@@ -318,47 +324,38 @@ export default function Dashboard() {
                       <div style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '6px',
+                        gap: '4px',
                         background: colors.cardBackgroundHover,
-                        padding: '4px 8px',
-                        borderRadius: '8px',
-                        border: `1px solid ${colors.cardBorder}`
+                        padding: '3px 6px',
+                        borderRadius: '6px',
+                        border: `1px solid ${colors.cardBorder}`,
+                        fontSize: '11px',
+                        maxWidth: '120px'
                       }}>
                         <span style={{
-                          color: colors.textSecondary,
-                          fontSize: '11px',
-                          fontFamily: 'Inter, sans-serif',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.5px',
-                          fontWeight: '600'
-                        }}>
-                          Domain:
-                        </span>
-                        <span style={{
                           color: '#10B981',
-                          fontSize: '12px',
                           fontFamily: 'Inter, sans-serif',
-                          fontWeight: '600'
+                          fontWeight: '600',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
                         }}>
                           {siteInfo.domain}
                         </span>
                       </div>
                       {siteInfo.plan && (
                         <div style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px',
                           background: colors.accent,
-                          padding: '4px 8px',
-                          borderRadius: '8px',
-                          boxShadow: '0 2px 8px rgba(168, 85, 247, 0.3)'
+                          padding: '3px 6px',
+                          borderRadius: '6px',
+                          boxShadow: '0 2px 4px rgba(168, 85, 247, 0.2)',
+                          fontSize: '10px'
                         }}>
                           <span style={{
                             color: '#FFFFFF',
-                            fontSize: '11px',
                             fontFamily: 'Inter, sans-serif',
                             textTransform: 'uppercase',
-                            letterSpacing: '0.5px',
+                            letterSpacing: '0.3px',
                             fontWeight: '700'
                           }}>
                             {siteInfo.plan}
@@ -374,19 +371,20 @@ export default function Dashboard() {
               <button 
                 onClick={toggleTheme}
                 style={{
-                  padding: '12px',
+                  padding: '10px',
                   background: colors.cardBackground,
                   backdropFilter: 'blur(20px)',
                   WebkitBackdropFilter: 'blur(20px)',
                   border: `1px solid ${colors.cardBorder}`,
-                  borderRadius: '12px',
+                  borderRadius: '10px',
                   color: colors.text,
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
-                  fontSize: '18px',
+                  fontSize: '16px',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px'
+                  gap: '6px',
+                  flexShrink: 0
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = colors.cardBackgroundHover;
@@ -401,7 +399,7 @@ export default function Dashboard() {
                 title={`Switch to ${isDarkMode ? 'Light' : 'Dark'} Mode`}
               >
                 <span>{isDarkMode ? '☀️' : '🌙'}</span>
-                <span style={{ fontSize: '12px', fontWeight: '500' }}>
+                <span style={{ fontSize: '11px', fontWeight: '500' }}>
                   {isDarkMode ? 'Light' : 'Dark'}
                 </span>
               </button>
@@ -410,24 +408,27 @@ export default function Dashboard() {
             {/* Main Title */}
             <div style={{ textAlign: 'center' }}>
               <h1 style={{
-                fontSize: '48px',
+                fontSize: 'clamp(32px, 8vw, 48px)',
                 fontWeight: 'bold',
                 color: 'transparent',
                 background: colors.accent,
                 backgroundClip: 'text',
                 WebkitBackgroundClip: 'text',
                 marginBottom: '16px',
-                fontFamily: 'Montserrat, sans-serif'
+                fontFamily: 'Montserrat, sans-serif',
+                lineHeight: '1.1'
               }}>
                 Yuno Analytics
               </h1>
               <p style={{
                 color: colors.textSecondary,
-                fontSize: '20px',
+                fontSize: 'clamp(16px, 4vw, 20px)',
                 margin: 0,
                 maxWidth: '600px',
                 marginLeft: 'auto',
-                marginRight: 'auto'
+                marginRight: 'auto',
+                lineHeight: '1.4',
+                padding: '0 16px'
               }}>
                 Track your AI chatbot's performance and engagement with real-time insights
               </p>
@@ -446,8 +447,8 @@ export default function Dashboard() {
           {/* Row 1: KPI Cards */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-            gap: '24px'
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: '20px'
           }}>
             <KpiCard 
               title="Chats Started" 
@@ -475,8 +476,8 @@ export default function Dashboard() {
           {/* Row 2: Charts and Chat Intent */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
-            gap: '24px'
+            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+            gap: '20px'
           }}>
             <ChartCard 
               title="Chat Sentiment" 
@@ -597,8 +598,8 @@ export default function Dashboard() {
           {/* Row 3: Lead Analytics */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
-            gap: '24px'
+            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+            gap: '20px'
           }}>
             <KpiCard 
               title="Lead Conversion Rate" 
