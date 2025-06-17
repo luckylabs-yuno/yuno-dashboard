@@ -1,11 +1,40 @@
+/* index.css (updated) :contentReference[oaicite:2]{index=2} */
+
+/* 1) Tailwind directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Import your fonts: */
+/* 2) Yuno Dark Theme CSS variables :contentReference[oaicite:3]{index=3} */
+:root {
+  /* Brand */
+  --yuno-blue-primary:    #2563eb;
+  --yuno-blue-light:      #3b82f6;
+  --yuno-blue-dark:       #1d4ed8;
+  --yuno-cyan-primary:    #06b6d4;
+  --yuno-cyan-light:      #22d3ee;
+  --yuno-cyan-dark:       #0891b2;
+  --yuno-gradient-main:   linear-gradient(to right, #2563eb, #06b6d4);
+
+  /* Backgrounds */
+  --yuno-bg-primary:      #111827;
+  --yuno-bg-secondary:    #1f2937;
+  --yuno-bg-tertiary:     #0f172a;
+
+  /* Glassmorphism */
+  --yuno-glass-bg:        rgba(31, 41, 55, 0.8);
+  --yuno-glass-border:    rgba(75, 85, 99, 0.3);
+  --yuno-glass-blur:      blur(20px);
+
+  /* Text */
+  --yuno-text-primary:    #ffffff;
+  --yuno-text-secondary:  #e5e7eb;
+  --yuno-text-muted:      #9ca3af;
+}
+
+/* 3) Fonts and resets */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap');
 
-/* Reset and base styles */
 * {
   box-sizing: border-box;
 }
@@ -14,19 +43,18 @@ html {
   font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* 4) Body background and text */
 body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #0f0f23;
-  /* Remove the flex and place-items that were causing layout issues */
+  color: var(--yuno-text-secondary);
+  background-color: var(--yuno-bg-primary);
 }
 
 #root {
@@ -34,59 +62,26 @@ body {
   width: 100%;
 }
 
-/* Animations */
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.4;
-  }
-}
+/* 5) Animations */
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+@keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+@keyframes fadeIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
 
-@keyframes shimmer {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Custom glassmorphism utilities */
+/* 6) Glass utilities (updated) */
 @layer utilities {
   .glass {
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: var(--yuno-glass-bg);
+    backdrop-filter: var(--yuno-glass-blur);
+    -webkit-backdrop-filter: var(--yuno-glass-blur);
+    border: 1px solid var(--yuno-glass-border);
   }
-  
   .glass-hover:hover {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.2);
-  }
+    background: rgba(17, 24, 39, 0.9);
+    border-color: rgba(107, 114, 128, 0.5);
+    box-shadow: 0 25px 50px -12px rgba(37, 99, 235, 0.3);
+  } /* per hover spec :contentReference[oaicite:4]{index=4} */
 
-  .animate-pulse {
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-
-  .animate-shimmer {
-    animation: shimmer 2s infinite;
-  }
-
-  .animate-fadeIn {
-    animation: fadeIn 0.6s ease-out;
-  }
+  .animate-pulse   { animation: pulse 2s cubic-bezier(0.4,0,0.6,1) infinite; }
+  .animate-shimmer{ animation: shimmer 2s infinite; }
+  .animate-fadeIn { animation: fadeIn 0.6s ease-out; }
 }

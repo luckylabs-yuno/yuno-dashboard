@@ -1,39 +1,53 @@
-/** @type {import('tailwindcss').Config} */
+// tailwind.config.js
 module.exports = {
   content: [
-    './src/**/*.{js,jsx,ts,tsx,html}',
+    "./index.html",
+    "./src/**/*.{js,jsx,ts,tsx}"
   ],
   theme: {
     extend: {
       colors: {
-        'charcoal': '#1f2937',       // dark gray for text and backgrounds
-        'mid-gray': '#4b5563',       // secondary text
-        'light-gray': '#f3f4f6',     // card backgrounds
-        'accent-blue': '#3b82f6',    // charts, buttons
-        'accent-purple': '#6366f1',  // alternate accents
+        // Brand
+        'yuno-blue-primary':    '#2563eb',
+        'yuno-blue-light':      '#3b82f6',
+        'yuno-blue-dark':       '#1d4ed8',
+        'yuno-cyan-primary':    '#06b6d4',
+        'yuno-cyan-light':      '#22d3ee',
+        'yuno-cyan-dark':       '#0891b2',
+        // Backgrounds
+        'yuno-bg-primary':      '#111827',
+        'yuno-bg-secondary':    '#1f2937',
+        'yuno-bg-tertiary':     '#0f172a',
+        // Text
+        'yuno-text-primary':    '#ffffff',
+        'yuno-text-secondary':  '#e5e7eb',
+        'yuno-text-muted':      '#9ca3af',
+        // Status
+        'success-primary':      '#10b981',
+        'success-light':        '#34d399',
+        'warning-primary':      '#f59e0b',
+        'warning-light':        '#fbbf24',
+        'error-primary':        '#ef4444',
+        'error-light':          '#f87171'
       },
-      fontFamily: {
-        heading: ['Montserrat', 'sans-serif'],
-        body: ['Inter', 'system-ui', 'sans-serif'],
-      },
-      boxShadow: {
-        'card': '0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06)',
-        'card-hover': '0 4px 6px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06)',
-      },
-      borderRadius: {
-        'lg': '1rem',
-        'xl': '1.5rem',
-      }
-    },
-    fontSize: {
-      'xs': ['0.75rem', { lineHeight: '1rem' }],
-      'sm': ['0.875rem', { lineHeight: '1.25rem' }],
-      'base': ['1rem', { lineHeight: '1.5rem' }],
-      'lg': ['1.125rem', { lineHeight: '1.75rem' }],
-      'xl': ['1.25rem', { lineHeight: '1.75rem' }],
-      '2xl': ['1.5rem', { lineHeight: '2rem' }],
-      '3xl': ['1.875rem', { lineHeight: '2.25rem' }],
+      backgroundImage: theme => ({
+        // Core gradients
+        'hero-gradient':           'linear-gradient(to bottom right, #111827, #1e293b, #1e3a8a)',
+        'section-gradient':        'linear-gradient(to bottom right, #1f2937, #374151, #4b5563)',
+        'main-cta-gradient':       'linear-gradient(to right, #2563eb, #06b6d4)',
+        'icon-gradient':           'linear-gradient(to bottom right, #3b82f6, #22d3ee)',
+        'text-gradient':           'linear-gradient(to right, #60a5fa, #22d3ee)',
+        'cta-hover-gradient':      'linear-gradient(to right, #1d4ed8, #0891b2)',
+        'secondary-hover-gradient':'linear-gradient(to right, #7c3aed, #ec4899)',
+        // Feature cards
+        'feature-1-gradient':      'linear-gradient(to bottom right, #eab308, #f97316)',
+        'feature-2-gradient':      'linear-gradient(to bottom right, #10b981, #059669)',
+        'feature-3-gradient':      'linear-gradient(to bottom right, #3b82f6, #06b6d4)',
+        'feature-4-gradient':      'linear-gradient(to bottom right, #8b5cf6, #ec4899)',
+        'feature-5-gradient':      'linear-gradient(to bottom right, #6366f1, #3b82f6)',
+        'feature-6-gradient':      'linear-gradient(to bottom right, #14b8a6, #06b6d4)'
+      })
     }
   },
-  plugins: [],
-};
+  plugins: []
+}

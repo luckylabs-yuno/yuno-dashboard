@@ -73,38 +73,75 @@ export function useChatsStarted(range = 'all') {
 }
 
 /** Average back-and-forth turns per session */
+/** Fixed Average Depth - Consistent with useChatsStarted approach */
 export function useAvgDepth(range = 'all') {
   const { profile, loading: profileLoading } = useProfile();
   const siteId = profile?.site_id;
   const [avg, setAvg] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
   useEffect(() => {
     if (profileLoading || !siteId) return;
+    
     async function fetchData() {
       try {
         const { since, until } = getDateBounds(range);
-        let msgQ = supabase.from('chat_history').select('id', { count: 'exact' }).eq('site_id', siteId);
-        let sesQ = supabase.from('chat_history').select('session_id', { count: 'exact', distinct: 'session_id' }).eq('site_id', siteId);
-        if (since) {
-          msgQ = msgQ.gte('created_at', since);
-          sesQ = sesQ.gte('created_at', since);
+        
+        // Query 1: Get ALL messages for the site_id, then apply date filters
+        let msgQuery = supabase
+          .from('chat_history')
+          .select('id')  // Just need to count messages
+          .eq('site_id', siteId);
+        
+        if (since) msgQuery = msgQuery.gte('created_at', since);
+        if (until) msgQuery = msgQuery.lt('created_at', until);
+        
+        // Query 2: Get session_ids EXACTLY like useChatsStarted does
+        // Using assistant messages to match the session counting logic
+        let sessionQuery = supabase
+          .from('chat_history')
+          .select('session_id')
+          .eq('site_id', siteId)
+          .eq('role', 'assistant');  // Same filter as useChatsStarted
+          
+        if (since) sessionQuery = sessionQuery.gte('created_at', since);
+        if (until) sessionQuery = sessionQuery.lt('created_at', until);
+        
+        const [{ data: messageData }, { data: sessionData }] = await Promise.all([
+          msgQuery,
+          sessionQuery
+        ]);
+        
+        // Dedupe sessions at code level - EXACTLY like useChatsStarted
+        const uniqueSessions = new Set(sessionData.map(r => r.session_id).filter(Boolean));
+        const sessionCount = uniqueSessions.size;
+        const totalMessages = messageData.length;
+        
+        // Calculate average
+        if (sessionCount > 0) {
+          // Option A: Total messages per session
+          const avgDepth = totalMessages / sessionCount;
+          setAvg(avgDepth);
+          
+          // Option B: If you want conversation turns (divide by 2)
+          // const avgDepth = (totalMessages / sessionCount) / 2;
+          // setAvg(avgDepth);
+        } else {
+          setAvg(0);
         }
-        if (until) {
-          msgQ = msgQ.lt('created_at', until);
-          sesQ = sesQ.lt('created_at', until);
-        }
-        const [{ count: total }, { count: sessions }] = await Promise.all([msgQ, sesQ]);
-        setAvg((total / sessions) / 2);
+        
       } catch (err) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     }
+    
     setLoading(true);
     fetchData();
   }, [range, siteId, profileLoading]);
+
   return { data: avg, loading, error };
 }
 
