@@ -7,11 +7,11 @@ import {
   HiCog, 
   HiColorSwatch, 
   HiDocumentText, 
-  HiToggleLeft,
   HiHome,
   HiChevronLeft,
   HiChevronRight
 } from 'react-icons/hi';
+import { HiToggleLeft } from 'react-icons/hi2'; // This one is in hi2
 
 const menuItems = [
   {
