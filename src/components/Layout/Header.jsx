@@ -1,15 +1,16 @@
+// src/components/Layout/Header.jsx
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { 
-  Bell, 
-  User, 
-  LogOut, 
-  Settings,
-  ChevronDown,
-  Sun,
-  Moon
-} from 'lucide-react';
+  HiBell, 
+  HiUser, 
+  HiLogout, 
+  HiCog,
+  HiChevronDown,
+  HiSun,
+  HiMoon
+} from 'react-icons/hi';
 
 export default function Header() {
   const { user, site, logout } = useAuth();
@@ -81,7 +82,7 @@ export default function Header() {
           }}
           title={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`}
         >
-          {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+          {isDarkMode ? <HiSun size={20} /> : <HiMoon size={20} />}
         </button>
 
         {/* Notifications */}
@@ -99,7 +100,7 @@ export default function Header() {
             position: 'relative'
           }}
         >
-          <Bell size={20} />
+          <HiBell size={20} />
           {/* Notification badge - placeholder */}
           <div style={{
             position: 'absolute',
@@ -130,9 +131,9 @@ export default function Header() {
               fontSize: '14px'
             }}
           >
-            <User size={20} />
+            <HiUser size={20} />
             <span>{user?.name || user?.email}</span>
-            <ChevronDown size={16} />
+            <HiChevronDown size={16} />
           </button>
 
           {/* Dropdown Menu */}
@@ -194,7 +195,7 @@ export default function Header() {
                     e.target.style.background = 'none';
                   }}
                 >
-                  <Settings size={16} />
+                  <HiCog size={16} />
                   Account Settings
                 </button>
 
@@ -220,7 +221,7 @@ export default function Header() {
                     e.target.style.background = 'none';
                   }}
                 >
-                  <LogOut size={16} />
+                  <HiLogout size={16} />
                   Logout
                 </button>
               </div>

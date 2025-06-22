@@ -1,52 +1,53 @@
+// src/components/Layout/Sidebar.jsx
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTheme } from '../../contexts/ThemeContext';
 import { 
-  BarChart3, 
-  Settings, 
-  Palette, 
-  FileText, 
-  ToggleLeft,
-  Home,
-  ChevronLeft,
-  ChevronRight
-} from 'lucide-react';
+  HiChartBar, 
+  HiCog, 
+  HiColorSwatch, 
+  HiDocumentText, 
+  HiToggleLeft,
+  HiHome,
+  HiChevronLeft,
+  HiChevronRight
+} from 'react-icons/hi';
 
 const menuItems = [
   {
     id: 'overview',
     label: 'Overview',
-    icon: Home,
+    icon: HiHome,
     path: '/dashboard'
   },
   {
     id: 'analytics',
     label: 'Analytics',
-    icon: BarChart3,
+    icon: HiChartBar,
     path: '/dashboard/analytics'
   },
   {
     id: 'widget',
     label: 'Widget Control',
-    icon: ToggleLeft,
+    icon: HiToggleLeft,
     path: '/dashboard/widget'
   },
   {
     id: 'customize',
     label: 'Customize',
-    icon: Palette,
+    icon: HiColorSwatch,
     path: '/dashboard/customize'
   },
   {
     id: 'content',
     label: 'Content',
-    icon: FileText,
+    icon: HiDocumentText,
     path: '/dashboard/content'
   },
   {
     id: 'settings',
     label: 'Settings',
-    icon: Settings,
+    icon: HiCog,
     path: '/dashboard/settings'
   }
 ];
@@ -112,7 +113,7 @@ export default function Sidebar({ collapsed, onToggle }) {
             justifyContent: 'center'
           }}
         >
-          {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+          {collapsed ? <HiChevronRight size={20} /> : <HiChevronLeft size={20} />}
         </button>
       </div>
 
