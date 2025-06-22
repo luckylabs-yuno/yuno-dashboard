@@ -1,8 +1,7 @@
 // src/pages/Dashboard.jsx
-import React, { useState, useMemo, useEffect } from 'react';
-import { useAuth } from '../lib/useAuth';
+import React, { useState, useMemo } from 'react';
+import { useAuth } from '../contexts/AuthContext'; // Changed from '../lib/useAuth'
 import { useTheme } from '../contexts/ThemeContext';
-import { supabase } from '../lib/supabase';
 import {
   useChatsStarted,
   useAvgDepth,
@@ -24,50 +23,16 @@ import {
 } from 'recharts';
 
 export default function Dashboard() {
-  const { isDarkMode, toggleTheme, colors } = useTheme();
-  const { session, loading: authLoading } = useAuth();
+  const { colors, isDarkMode } = useTheme(); // Removed toggleTheme
+  const { user, site } = useAuth(); // Using new AuthContext
   const [dateRange, setDateRange] = useState('today');
   const [modalState, setModalState] = useState({ open: false, title: '', content: null });
-  const [userProfile, setUserProfile] = useState(null);
-  const [siteInfo, setSiteInfo] = useState(null);
 
-  // Fetch user profile and site info
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if (!session?.user?.id) return;
-
-      try {
-        // Fetch user profile (which contains site_id and domain in the same row)
-        const { data: profile, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
-
-        if (error) {
-          console.error('Error fetching profile:', error);
-          return;
-        }
-
-        if (profile) {
-          setUserProfile(profile);
-          // No need for separate site query - site_id and domain are in the same profile row
-          setSiteInfo({
-            site_id: profile.site_id,
-            domain: profile.domain,
-            plan: profile.plan
-          });
-        }
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      }
-    };
-
-    fetchUserData();
-  }, [session]);
+  // Remove the old useEffect for fetching user data - now handled by AuthContext
+  // Remove userProfile and siteInfo state - now comes from useAuth
 
   /* --------------------------------------------------
-   * Data hooks (always in the same order!)
+   * Data hooks (using site from AuthContext)
    * --------------------------------------------------*/
   const { count: chatsStarted, loading: loadChats, error: errChats } = useChatsStarted(dateRange);
   const { data: avgDepth, loading: loadDepth, error: errDepth } = useAvgDepth(dateRange);
@@ -78,38 +43,14 @@ export default function Dashboard() {
   const { distribution: langDist, loading: loadLang, error: errLang } = useLanguageDistribution(dateRange);
   const { items: lowConf, loading: loadLow, error: errLow } = useLowConfidenceQuestions(dateRange);
 
-  /* --------------------------------------------------
-   * Early‑return states
-   * --------------------------------------------------*/
-  if (authLoading) return (
-    <div style={{ 
-      minHeight: '100vh', 
-      background: colors.background, 
-      display: 'flex', 
-      alignItems: 'center', 
-      justifyContent: 'center' 
-    }}>
-      <div style={{ color: colors.text, fontSize: '18px' }}>Loading your dashboard...</div>
-    </div>
-  );
-  
-  if (!session) return (
-    <div style={{ 
-      minHeight: '100vh', 
-      background: colors.background, 
-      display: 'flex', 
-      alignItems: 'center', 
-      justifyContent: 'center' 
-    }}>
-      <div style={{ color: colors.text, fontSize: '18px' }}>Please log in to access your dashboard.</div>
-    </div>
-  );
+  // Remove early return states - now handled by AuthContext and ProtectedRoute
 
   /* --------------------------------------------------
    * Filter leads to only count valid ones (email OR phone)
    * --------------------------------------------------*/
   const validLeads = useMemo(() => {
-    return leads.filter(lead => lead.email || lead.phone);
+    if (!leads) return [];
+    return leads.filter(lead => lead && (lead.email || lead.phone));
   }, [leads]);
 
   /* --------------------------------------------------
@@ -128,9 +69,9 @@ export default function Dashboard() {
    * Chart data & pastel colours
    * --------------------------------------------------*/
   const sentimentData = [
-    { name: 'Positive', value: positive },
-    { name: 'Neutral', value: neutral },
-    { name: 'Negative', value: negative },
+    { name: 'Positive', value: positive || 0 },
+    { name: 'Neutral', value: neutral || 0 },
+    { name: 'Negative', value: negative || 0 },
   ];
 
   // Theme-aware pastel colors
@@ -198,8 +139,6 @@ export default function Dashboard() {
    * --------------------------------------------------*/
   return (
     <div style={{
-      minHeight: '100vh',
-      background: colors.background,
       position: 'relative',
       overflow: 'hidden'
     }}>
@@ -212,7 +151,8 @@ export default function Dashboard() {
         height: '300px',
         background: `radial-gradient(circle, ${colors.orb1} 0%, transparent 70%)`,
         borderRadius: '50%',
-        filter: 'blur(60px)'
+        filter: 'blur(60px)',
+        zIndex: 1
       }}></div>
       <div style={{
         position: 'absolute',
@@ -222,244 +162,76 @@ export default function Dashboard() {
         height: '300px',
         background: `radial-gradient(circle, ${colors.orb2} 0%, transparent 70%)`,
         borderRadius: '50%',
-        filter: 'blur(60px)'
+        filter: 'blur(60px)',
+        zIndex: 1
       }}></div>
       
       {/* Main Content Container */}
       <div style={{
         position: 'relative',
-        zIndex: 10,
-        maxWidth: '1400px',
-        margin: '0 auto',
-        padding: '32px 24px'
+        zIndex: 10
       }}>
         
-        {/* Header */}
-        <header style={{ marginBottom: '48px' }}>
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '32px'
-          }}>
-            {/* Top Bar with User Info and Theme Toggle */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              background: colors.cardBackground,
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
-              border: `1px solid ${colors.cardBorder}`,
-              borderRadius: '20px',
-              padding: '16px 24px',
-              boxShadow: colors.shadow
+        {/* Page Header with Date Picker */}
+        <div style={{ 
+          marginBottom: '32px',
+          display: 'flex', 
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          flexWrap: 'wrap',
+          gap: '16px'
+        }}>
+          <div>
+            <h1 style={{
+              fontSize: 'clamp(28px, 6vw, 36px)',
+              fontWeight: 'bold',
+              color: 'transparent',
+              background: colors.accent,
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              margin: 0,
+              fontFamily: 'Montserrat, sans-serif',
+              lineHeight: '1.2'
             }}>
-              {/* User Info */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <div style={{
-                  width: '40px',
-                  height: '40px',
-                  background: colors.accent,
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#FFFFFF',
-                  fontWeight: '700',
-                  fontSize: '16px',
-                  fontFamily: 'Montserrat, sans-serif'
-                }}>
-                  {session?.user?.email?.[0]?.toUpperCase()}
-                </div>
-                <div>
-                  <div style={{
-                    color: colors.text,
-                    fontWeight: '600',
-                    fontSize: '14px',
-                    fontFamily: 'Inter, sans-serif'
-                  }}>
-                    {session?.user?.email}
-                  </div>
-                  {siteInfo && (
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '12px',
-                      marginTop: '4px'
-                    }}>
-                      <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        background: colors.cardBackgroundHover,
-                        padding: '4px 8px',
-                        borderRadius: '8px',
-                        border: `1px solid ${colors.cardBorder}`
-                      }}>
-                        <span style={{
-                          color: colors.textSecondary,
-                          fontSize: '11px',
-                          fontFamily: 'Inter, sans-serif',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.5px',
-                          fontWeight: '600'
-                        }}>
-                          Site ID:
-                        </span>
-                        <span style={{
-                          color: colors.text,
-                          fontSize: '12px',
-                          fontFamily: 'Inter, sans-serif',
-                          fontWeight: '600'
-                        }}>
-                          {siteInfo.site_id}
-                        </span>
-                      </div>
-                      <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        background: colors.cardBackgroundHover,
-                        padding: '4px 8px',
-                        borderRadius: '8px',
-                        border: `1px solid ${colors.cardBorder}`
-                      }}>
-                        <span style={{
-                          color: colors.textSecondary,
-                          fontSize: '11px',
-                          fontFamily: 'Inter, sans-serif',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.5px',
-                          fontWeight: '600'
-                        }}>
-                          Domain:
-                        </span>
-                        <span style={{
-                          color: '#10B981',
-                          fontSize: '12px',
-                          fontFamily: 'Inter, sans-serif',
-                          fontWeight: '600'
-                        }}>
-                          {siteInfo.domain}
-                        </span>
-                      </div>
-                      {siteInfo.plan && (
-                        <div style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          background: colors.accent,
-                          padding: '4px 8px',
-                          borderRadius: '8px',
-                          boxShadow: '0 2px 8px rgba(168, 85, 247, 0.3)'
-                        }}>
-                          <span style={{
-                            color: '#FFFFFF',
-                            fontSize: '11px',
-                            fontFamily: 'Inter, sans-serif',
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.5px',
-                            fontWeight: '700'
-                          }}>
-                            {siteInfo.plan}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Theme Toggle */}
-              <button 
-                onClick={toggleTheme}
-                style={{
-                  padding: '12px',
-                  background: colors.cardBackground,
-                  backdropFilter: 'blur(20px)',
-                  WebkitBackdropFilter: 'blur(20px)',
-                  border: `1px solid ${colors.cardBorder}`,
-                  borderRadius: '12px',
-                  color: colors.text,
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  fontSize: '18px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = colors.cardBackgroundHover;
-                  e.currentTarget.style.transform = 'scale(1.05)';
-                  e.currentTarget.style.borderColor = colors.cardBorderHover;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = colors.cardBackground;
-                  e.currentTarget.style.transform = 'scale(1)';
-                  e.currentTarget.style.borderColor = colors.cardBorder;
-                }}
-                title={`Switch to ${isDarkMode ? 'Light' : 'Dark'} Mode`}
-              >
-                <span>{isDarkMode ? '☀️' : '🌙'}</span>
-                <span style={{ fontSize: '12px', fontWeight: '500' }}>
-                  {isDarkMode ? 'Light' : 'Dark'}
-                </span>
-              </button>
-            </div>
-
-            {/* Main Title */}
-            <div style={{ textAlign: 'center' }}>
-              <h1 style={{
-                fontSize: '48px',
-                fontWeight: 'bold',
-                color: 'transparent',
-                background: colors.accent,
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                marginBottom: '16px',
-                fontFamily: 'Montserrat, sans-serif'
-              }}>
-                Yuno Analytics
-              </h1>
-              <p style={{
-                color: colors.textSecondary,
-                fontSize: '20px',
-                margin: 0,
-                maxWidth: '600px',
-                marginLeft: 'auto',
-                marginRight: 'auto'
-              }}>
-                Track your AI chatbot's performance and engagement with real-time insights
-              </p>
-            </div>
-
-            {/* Date Range Picker */}
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <DateRangePicker rangeOptions={ranges} selected={dateRange} onChange={setDateRange} />
-            </div>
+              Analytics Overview
+            </h1>
+            <p style={{
+              color: colors.textSecondary,
+              fontSize: 'clamp(14px, 3vw, 18px)',
+              margin: '8px 0 0 0',
+              lineHeight: '1.4'
+            }}>
+              Track your AI chatbot's performance and engagement with real-time insights
+            </p>
           </div>
-        </header>
-
+          
+          <DateRangePicker 
+            rangeOptions={ranges} 
+            selected={dateRange} 
+            onChange={setDateRange} 
+          />
+        </div>
+        
         {/* Dashboard Grid */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
           
           {/* Row 1: KPI Cards */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-            gap: '24px'
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: '20px'
           }}>
             <KpiCard 
               title="Chats Started" 
               subtitle="Total unique conversations initiated"
-              value={chatsStarted} 
+              value={chatsStarted || 0} 
               loading={loadChats} 
               error={errChats}
             />
             <KpiCard 
               title="Chat Depth" 
               subtitle="Average messages per conversation"
-              value={avgDepth?.toFixed(1)} 
+              value={avgDepth ? avgDepth.toFixed(1) : '0.0'} 
               loading={loadDepth} 
               error={errDepth}
             />
@@ -475,8 +247,8 @@ export default function Dashboard() {
           {/* Row 2: Charts and Chat Intent */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
-            gap: '24px'
+            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+            gap: '20px'
           }}>
             <ChartCard 
               title="Chat Sentiment" 
@@ -597,8 +369,8 @@ export default function Dashboard() {
           {/* Row 3: Lead Analytics */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
-            gap: '24px'
+            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+            gap: '20px'
           }}>
             <KpiCard 
               title="Lead Conversion Rate" 
