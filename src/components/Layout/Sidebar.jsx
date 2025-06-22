@@ -5,13 +5,13 @@ import { useTheme } from '../../contexts/ThemeContext';
 import { 
   HiChartBar, 
   HiCog, 
-  HiColorSwatch, 
+  HiPencil, 
   HiDocumentText, 
+  HiAdjustments,
   HiHome,
   HiChevronLeft,
   HiChevronRight
 } from 'react-icons/hi';
-import { HiToggleLeft } from 'react-icons/hi2'; // This one is in hi2
 
 const menuItems = [
   {
@@ -29,13 +29,13 @@ const menuItems = [
   {
     id: 'widget',
     label: 'Widget Control',
-    icon: HiToggleLeft,
+    icon: HiAdjustments, // Using HiAdjustments instead of HiToggleLeft
     path: '/dashboard/widget'
   },
   {
     id: 'customize',
     label: 'Customize',
-    icon: HiColorSwatch,
+    icon: HiPencil, // Using HiPencil instead of HiColorSwatch
     path: '/dashboard/customize'
   },
   {
@@ -51,6 +51,8 @@ const menuItems = [
     path: '/dashboard/settings'
   }
 ];
+
+// ... rest of the component stays exactly the same
 
 export default function Sidebar({ collapsed, onToggle }) {
   const { colors } = useTheme();
